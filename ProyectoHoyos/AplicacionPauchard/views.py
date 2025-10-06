@@ -40,8 +40,28 @@ class AlumnoView(View):
         datos={'message':"Sucess"}
         return JsonResponse(datos)
 
-    def put(self,request):
-        pass
+    def put(self,request,rut):
+        jd = json.loads(request.body)
+        alumnos = list(Alumno.objects.filter(rut=rut).values())
+        if len(alumnos)>0: #es porque si consigue registros
+            persona = Alumno.objects.get(rut=rut)
+            persona.nombrecompleto = jd['nombrecompleto']
+            persona.carrera = jd['carrera']
+            persona.save() #guardar el registro
+            datos={'message':"Success"}
+        else:
+            datos={'message':"EL ALUMNO NO EXISTE"}
+        return JsonResponse(datos)
 
-    def delete(self,request):
-        pass
+
+    def delete(self,request,rut):
+        alumnos = list(Alumno.objects.filter(rut=rut).values())
+        if len(alumnos)>0: #si consigue registros
+            #proceder a borrar el registro del ORM
+            Alumno.objects.filter(rut=rut).delete()
+            datos={'message':"Success"}
+        else:
+            datos={'message':"ALUMNO NO EXISTE"}
+        return JsonResponse(datos)
+
+
