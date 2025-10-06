@@ -15,14 +15,23 @@ class AlumnoView(View):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self,request):
-        # Declarar una variable para obtener los datos de todos los alumnos como un objeto de lista de valores
-        alumnos = list(Alumno.objects.values()) 
-        if len(alumnos)>0: #es por que  si consigue registros, crea un diccionario de datos con la informacion
-            datos={'message':"Sucess",'alumnos:':alumnos}
+    def get(self,request, rut=''):
+        if (rut!=''): #para filtrar un unico registro
+            alumnos = list(Alumno.objects.filter(rut=rut).values())
+            if len(alumnos) > 0:
+                persona=alumnos[0]
+                datos={'message':"Success" , 'alumno':persona}
+            else:
+                datos={'message':"ALUMNO NO ENCONTRADO"}
+            return JsonResponse(datos)
         else:
-            datos={'message': "ALUMNO NO ENCONTRADO"}
-        return JsonResponse(datos)
+            # Declarar una variable para obtener los datos de todos los alumnos como un objeto de lista de valores
+            alumnos = list(Alumno.objects.values()) 
+            if len(alumnos)>0: #es por que  si consigue registros, crea un diccionario de datos con la informacion
+                datos={'message':"Sucess",'alumnos:':alumnos}
+            else:
+                datos={'message': "ALUMNO NO ENCONTRADO"}
+            return JsonResponse(datos)
 
     def post(self,request):
         jd = json.loads(request.body)
